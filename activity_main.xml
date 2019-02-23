@@ -8,39 +8,23 @@
     tools:context=".MainActivity">
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/downloadedImage"
+        android:layout_width="231dp"
+        android:layout_height="231dp"
+        app:srcCompat="@drawable/ic_launcher_background"
+        tools:layout_editor_absoluteX="90dp"
+        tools:layout_editor_absoluteY="41dp" />
+
+    <ImageView
+        android:id="@+id/processedImage"
         android:layout_width="231dp"
         android:layout_height="231dp"
         app:srcCompat="@drawable/ic_launcher_background"
         tools:layout_editor_absoluteX="90dp"
         tools:layout_editor_absoluteY="317dp" />
 
-    <Button
-        android:id="@+id/button4"
-        android:layout_width="122dp"
-        android:layout_height="58dp"
-        android:text="Button"
-        tools:layout_editor_absoluteX="273dp"
-        tools:layout_editor_absoluteY="657dp" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="122dp"
-        android:layout_height="58dp"
-        android:text="Button"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="657dp" />
-
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="110dp"
-        android:layout_height="58dp"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="150dp"
-        tools:layout_editor_absoluteY="657dp" />
-
-    <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/erythrocytes"
         android:layout_width="340dp"
         android:layout_height="49dp"
         android:text="Количество эритроцитов:"
@@ -48,12 +32,30 @@
         tools:layout_editor_absoluteX="35dp"
         tools:layout_editor_absoluteY="587dp" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="231dp"
-        android:layout_height="231dp"
-        app:srcCompat="@drawable/ic_launcher_background"
-        tools:layout_editor_absoluteX="90dp"
-        tools:layout_editor_absoluteY="41dp" />
+    <Button
+        android:id="@+id/download"
+        android:layout_width="122dp"
+        android:layout_height="58dp"
+        android:text="Button"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="657dp" />
+
+    <Button
+        android:id="@+id/treatment"
+        android:layout_width="122dp"
+        android:layout_height="58dp"
+        android:text="Button"
+        tools:layout_editor_absoluteX="273dp"
+        tools:layout_editor_absoluteY="657dp" />
+
+
+    <TextView
+        android:id="@+id/number"
+        android:layout_width="110dp"
+        android:layout_height="58dp"
+        android:text="TextView"
+        tools:layout_editor_absoluteX="150dp"
+        tools:layout_editor_absoluteY="657dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
