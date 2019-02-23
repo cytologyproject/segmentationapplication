@@ -30,5 +30,12 @@
         android:text="TextView"
         tools:layout_editor_absoluteX="150dp"
         tools:layout_editor_absoluteY="657dp" />
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="187dp"
+        android:layout_height="56dp"
+        android:text="Количество эритроцитов:"
+        tools:layout_editor_absoluteX="112dp"
+        tools:layout_editor_absoluteY="578dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
