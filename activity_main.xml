@@ -41,11 +41,12 @@
     
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="187dp"
-        android:layout_height="56dp"
+        android:layout_width="340dp"
+        android:layout_height="52dp"
         android:text="Количество эритроцитов:"
-        tools:layout_editor_absoluteX="112dp"
-        tools:layout_editor_absoluteY="578dp" />
+        android:textSize="25sp"
+        tools:layout_editor_absoluteX="35dp"
+        tools:layout_editor_absoluteY="595dp" />
     
     <ImageView
         android:id="@+id/imageView"
