@@ -38,7 +38,8 @@
         android:layout_height="58dp"
         android:text="Button"
         tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="657dp" />
+        tools:layout_editor_absoluteY="657dp"
+        android:onClick="downloadClick" />
 
     <Button
         android:id="@+id/treatment"
@@ -46,7 +47,8 @@
         android:layout_height="58dp"
         android:text="Button"
         tools:layout_editor_absoluteX="273dp"
-        tools:layout_editor_absoluteY="657dp" />
+        tools:layout_editor_absoluteY="657dp"
+        android:onClick="treatmentClick"/>
 
 
     <TextView
