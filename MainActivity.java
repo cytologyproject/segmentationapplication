@@ -17,31 +17,15 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
+    static final int GALLERY_REQUEST = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
-
-
-    public void downloadClick(View view) {
-    }
-
-    public void treatmentClick(View view) {
-    }
-
-  /*  static final int GALLERY_REQUEST = 1;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
         Button button = (Button)findViewById(R.id.download);
         button.setOnClickListener(new View.OnClickListener() {
-
             @Override
-            public void onClick(View v) {
+            public void downloadClick(View view) {
                 Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                 photoPickerIntent.setType("image/*");
                 startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
@@ -49,6 +33,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+
+    public void treatmentClick(View view) {
+    }
+
+  /*  
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
