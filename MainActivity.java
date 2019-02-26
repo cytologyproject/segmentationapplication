@@ -1,55 +1,43 @@
-package com.example.segmentationaplication;
+package com.example.camerasample;
+import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import androidx.appcompat.app.AppCompatActivity;
 import android.provider.MediaStore;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
-    static final int GALLERY_REQUEST = 1;
+    private ImageView mimageView;
+    private static final  int REQUEST_IMAGE_CAPTURE = 101;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button button = (Button) findViewById(R.id.download);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void downloadClick(View view) {
-                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-                photoPickerIntent.setType("image/*");
-                startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
-            }
-        });
+        mimageView = findViewById(R.id.ImageView);
     }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
-        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
-        Bitmap bitmap = null;
-        ImageView imageView = (ImageView) findViewById(R.id.downloadedImage);
+    public void takePicture(View view)
+    {
+        Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        switch (requestCode) {
-            case GALLERY_REQUEST:
-                if (resultCode == RESULT_OK) {
-                    Uri selectedImage = imageReturnedIntent.getData();
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    imageView.setImageBitmap(bitmap);
-                }
+        if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
+        {
+            startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
         }
-    }    
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if(requestCode==REQUEST_IMAGE_CAPTURE && resultCode==RESULT_OK)
+        {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            mimageView.setImageBitmap(imageBitmap);
+        }
+    }
 }
