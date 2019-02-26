@@ -1,74 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    >
+
 
     <ImageView
-        android:id="@+id/downloadedImage"
-        android:layout_width="231dp"
-        android:layout_height="231dp"
-        android:layout_marginBottom="459dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_launcher_background" />
-
-    <ImageView
-        android:id="@+id/processedImage"
-        android:layout_width="231dp"
-        android:layout_height="231dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_launcher_background"
-        tools:layout_editor_absoluteY="317dp" />
-
-    <TextView
-        android:id="@+id/erythrocytes"
-        android:layout_width="340dp"
-        android:layout_height="49dp"
-        android:text="Количество эритроцитов:"
-        android:textColor="@color/black"
-        android:textSize="25sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="587dp" />
-
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:src="@mipmap/ic_launcher"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="55dp"
+        android:id="@+id/ImageView"
+        />
 
     <Button
-        android:id="@+id/download"
-        android:layout_width="134dp"
-        android:layout_height="58dp"
-        android:onClick="downloadClick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="55dp"
+        android:background="@android:color/holo_orange_dark"
+        android:onClick="takePicture"
         android:text="Фото"
-        android:textColor="@color/black"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="657dp" />
+        android:textColor="@android:color/white"
+        tools:ignore="OnClick" />
 
-    <Button
-        android:id="@+id/treatment"
-        android:layout_width="130dp"
-        android:layout_height="58dp"
-        android:onClick="treatmentClick"
-        android:text="Обработка"
-        android:textColor="@color/black"
-        tools:layout_editor_absoluteX="273dp"
-        tools:layout_editor_absoluteY="657dp" />
-
-    <TextView
-        android:id="@+id/number"
-        android:layout_width="115dp"
-        android:layout_height="58dp"
-        android:text="TextView"
-        android:textColor="@color/black"
-        tools:layout_editor_absoluteX="150dp"
-        tools:layout_editor_absoluteY="657dp" />
+</LinearLayout>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
