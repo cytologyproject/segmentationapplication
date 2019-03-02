@@ -10,25 +10,42 @@
 
 
     <ImageView
+        android:id="@+id/ImageView"
         android:layout_width="250dp"
         android:layout_height="250dp"
-        android:src="@mipmap/ic_launcher"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="55dp"
-        android:id="@+id/ImageView"
-        />
+        android:layout_marginTop="10dp"
+        android:src="@mipmap/ic_launcher" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="120dp"
+        android:layout_height="65dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="55dp"
-        android:background="@android:color/holo_orange_dark"
+        android:layout_marginTop="20dp"
+        android:background="@android:color/holo_green_light"
         android:onClick="takePicture"
         android:text="Фото"
         android:textColor="@android:color/white"
         tools:ignore="OnClick" />
 
+    <Button
+        android:layout_width="120dp"
+        android:layout_height="65dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:background="@android:color/holo_green_light"
+        android:text="результат"
+        android:textColor="@android:color/white"
+        tools:ignore="OnClick" />
+
+    <TextView
+        android:id="@+id/erythrocytes"
+        android:layout_width="340dp"
+        android:layout_height="49dp"
+        android:layout_marginTop="15dp"
+        android:text="Количество эритроцитов:"
+        android:textColor="@android:color/black"
+        android:textSize="25sp"
+        tools:layout_editor_absoluteY="587dp" />
+
 </LinearLayout>
-
-
