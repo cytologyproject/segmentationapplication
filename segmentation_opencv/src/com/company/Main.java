@@ -24,7 +24,7 @@ public class Main {
         for (File file : files) {
             System.out.println("Directory: " + file.getName());
             process(file.getName());
-            //break;
+            break;
         }
     }
 
