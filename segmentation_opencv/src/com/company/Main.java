@@ -9,6 +9,8 @@ import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import static org.opencv.core.Core.NORM_MINMAX;
+
 public class Main {
 
 
@@ -35,8 +37,31 @@ public class Main {
         init_img.convertTo(init_img, CvType.CV_8UC4);
         write_me("init", filename, init_img);
 
+
+        Mat kernel = Mat.ones(3, 3, CvType.CV_32F);
+        kernel.put(1,1,-8);
+
+        Mat mLaplacian = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+        Mat mLaplacian2 = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+        Mat mLaplacian_prt = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+        Mat sharp = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+        Mat mSubstr = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+        Mat mSubstr2 = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+        Mat mSubstr_prt = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+
+        Imgproc.filter2D(init_img, mLaplacian, CvType.CV_32FC4, kernel);
+
+        init_img.convertTo(sharp,CvType.CV_32FC4);
+        Core.subtract(sharp, mLaplacian, mSubstr);
+
+        Core.normalize(mSubstr, mSubstr2, 0,1,NORM_MINMAX);
+        mSubstr2.convertTo(mSubstr_prt, CvType.CV_8UC4,255);
+        write_me("substr", filename, mSubstr_prt);
+
+
+
         Mat img_gray = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
-        Imgproc.cvtColor(init_img, img_gray, Imgproc.COLOR_RGBA2GRAY);
+        Imgproc.cvtColor(mSubstr_prt, img_gray, Imgproc.COLOR_RGBA2GRAY);
         write_me("gray", filename, img_gray);
 
         Mat img_thr = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
@@ -54,7 +79,10 @@ public class Main {
 
         Mat img_thr2 = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC4);
         Mat img_thr2_prt = new Mat(init_img.height(), init_img.width(), CvType.CV_32FC1);
-        Imgproc.threshold(img_dist2, img_thr2, 0.1, 1.0, Imgproc.THRESH_BINARY);
+        //Imgproc.threshold(img_dist2, img_thr2, 0.1, 1.0, Imgproc.THRESH_BINARY);
+        Imgproc.adaptiveThreshold(img_dist_prt, img_thr2, 10, Imgproc.ADAPTIVE_THRESH_MEAN_C,
+                Imgproc.THRESH_BINARY, 111, 0);
+        Imgproc.erode(img_thr2,img_thr2, Mat.ones(3, 3, CvType.CV_8U));
         img_thr2.convertTo(img_thr2_prt, CvType.CV_8UC1, 255);
         write_me("thr2", filename, img_thr2_prt);
 
@@ -65,7 +93,14 @@ public class Main {
 
         Imgproc.findContours(img_thr2, contours, new Mat(), Imgproc.RETR_FLOODFILL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        System.out.println(contours.size());
+        int real_count = 0;
+
+        for(MatOfPoint contour : contours){
+            real_count += Imgproc.contourArea(contour) > 500 ? 1 : 0;
+        }
+
+        System.out.println(real_count);
+
     }
 
 }
