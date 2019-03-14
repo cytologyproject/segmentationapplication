@@ -37,6 +37,8 @@ import static org.opencv.imgproc.Imgproc.COLORMAP_PARULA;
 import static org.opencv.imgproc.Imgproc.COLORMAP_RAINBOW;
 import static org.opencv.imgproc.Imgproc.COLORMAP_SUMMER;
 
+import static org.opencv.core.Core.NORM_MINMAX;
+
 public class ColorBlobDetectionActivity extends Activity implements OnTouchListener, CvCameraViewListener2 {
     private static final String  TAG              = "OCVSample::Activity";
 
@@ -59,9 +61,6 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     private Mat kernel;
     private Mat kernel2;
 
-    private Mat mLaplacian;
-    private Mat sharp;
-    private Mat mSubstract;
 
     private Mat mTreshold;
     private Mat mDist;
@@ -158,9 +157,7 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         kernel2 = Mat.ones(3, 3, CvType.CV_8U);
 
         //Intermediate results
-        mLaplacian = new Mat(mRgba.height(), mRgba.width(), CvType.CV_32F);
-        sharp = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
-        mSubstract = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
+
 
         mTreshold = new Mat(mResult.height(), mResult.width(), CvType.CV_8UC1);
         mDist = new Mat(mResult.height(), mResult.width(), CvType.CV_32FC1);
@@ -232,9 +229,21 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         try {
 
             //mRgba.convertTo(mRgba, CvType.CV_8UC4);
+            Mat mLaplacian = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
+            Mat sharp = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
+            Mat mSubstr = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
+            Mat mSubstr2 = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
+            Mat mSubstr_prt = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
+            Imgproc.filter2D(mRgba, mLaplacian, CvType.CV_32FC4, kernel);
+            mRgba.convertTo(sharp,CvType.CV_32FC4);
+            Core.subtract(sharp, mLaplacian, mSubstr);
+            Core.normalize(mSubstr, mSubstr2, 0,1,NORM_MINMAX);
+            mSubstr2.convertTo(mSubstr_prt, CvType.CV_8UC4,255);
+
 
             Mat img_gray = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
-            Imgproc.cvtColor(mRgba, img_gray, Imgproc.COLOR_RGBA2GRAY);
+            Imgproc.cvtColor(mSubstr_prt, img_gray, Imgproc.COLOR_RGBA2GRAY);
+
 
             Mat img_thr = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
             Imgproc.threshold(img_gray, img_thr, 40, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
@@ -250,8 +259,15 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
 
             Mat img_thr2 = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC4);
             Mat img_thr2_prt = new Mat(mRgba.height(), mRgba.width(), CvType.CV_32FC1);
-            Imgproc.threshold(img_dist2, img_thr2, 0.1, 1.0, Imgproc.THRESH_BINARY);
+            //Imgproc.threshold(img_dist2, img_thr2, 0.1, 1.0, Imgproc.THRESH_BINARY);
+
+            Imgproc.adaptiveThreshold(img_dist_prt, img_thr2, 10, Imgproc.ADAPTIVE_THRESH_MEAN_C,
+                    Imgproc.THRESH_BINARY, 111, 0);
+            Imgproc.erode(img_thr2,img_thr2, Mat.ones(3, 3, CvType.CV_8U));
             img_thr2.convertTo(img_thr2_prt, CvType.CV_8UC1, 255);
+
+
+
 
             List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 
