@@ -41,6 +41,8 @@ public class Main {
         Mat kernel = Mat.ones(3, 3, CvType.CV_32F);
         kernel.put(1,1,-8);
 
+        Mat kernel2 = Mat.ones(3, 3, CvType.CV_32F);
+
         Mat mLaplacian = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
         Mat mLaplacian2 = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
         Mat mLaplacian_prt = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
@@ -54,6 +56,7 @@ public class Main {
         init_img.convertTo(sharp,CvType.CV_32FC4);
         Core.subtract(sharp, mLaplacian, mSubstr);
 
+
         Core.normalize(mSubstr, mSubstr2, 0,1,NORM_MINMAX);
         mSubstr2.convertTo(mSubstr_prt, CvType.CV_8UC4,255);
         write_me("substr", filename, mSubstr_prt);
@@ -64,10 +67,19 @@ public class Main {
         Imgproc.cvtColor(mSubstr_prt, img_gray, Imgproc.COLOR_RGBA2GRAY);
         write_me("gray", filename, img_gray);
 
+
+
+
+
+
+
+
         Mat img_thr = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
         Imgproc.threshold(img_gray, img_thr, 40, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
 
         write_me("thr", filename, img_thr);
+
+
 
         Mat img_dist = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC4);
         Mat img_dist2 = new Mat(init_img.height(), init_img.width(), CvType.CV_32FC1);
@@ -87,11 +99,24 @@ public class Main {
         write_me("thr2", filename, img_thr2_prt);
 
 
+        //Обрезка
+
+        Mat thresh_erode = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+        Mat thresh_erode2 = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+        Mat thresh_dilate = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+        Mat thresh_dilate2 = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+        Imgproc.erode(img_thr2_prt, thresh_erode, kernel2);
+        Imgproc.erode(thresh_erode, thresh_erode2, kernel2);
+        Imgproc.dilate(thresh_erode2, thresh_dilate, kernel2);
+        Imgproc.dilate(thresh_dilate, thresh_dilate2, kernel2);
+        write_me("dilate", filename, thresh_dilate2);
+
+
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 
-        img_thr2.convertTo(img_thr2, CvType.CV_32SC1);
+        thresh_dilate2.convertTo(thresh_dilate2, CvType.CV_32SC1);
 
-        Imgproc.findContours(img_thr2, contours, new Mat(), Imgproc.RETR_FLOODFILL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(thresh_dilate2, contours, new Mat(), Imgproc.RETR_FLOODFILL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         int real_count = 0;
 
@@ -103,4 +128,7 @@ public class Main {
 
     }
 
+
+
 }
+
