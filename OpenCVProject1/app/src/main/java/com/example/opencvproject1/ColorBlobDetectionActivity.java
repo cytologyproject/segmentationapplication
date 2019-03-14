@@ -222,62 +222,88 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         return false; // don't need subsequent touch events
     }
 
+
+    public static int process2(Mat img_gray) {
+
+        Mat img_thr2 = new Mat(img_gray.height(), img_gray.width(), CvType.CV_8UC4);
+        Mat img_thr2_prt = new Mat(img_gray.height(), img_gray.width(), CvType.CV_32FC1);
+        Imgproc.adaptiveThreshold(img_gray, img_thr2, 10, Imgproc.ADAPTIVE_THRESH_MEAN_C,
+                Imgproc.THRESH_BINARY, 131, 0);
+        Imgproc.erode(img_thr2,img_thr2, Mat.ones(5, 5, CvType.CV_8U));
+
+
+        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+
+        img_thr2.convertTo(img_thr2, CvType.CV_32SC1);
+
+        Imgproc.findContours(img_thr2, contours, new Mat(), Imgproc.RETR_FLOODFILL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        int real_count = 0;
+
+        for(MatOfPoint contour : contours){
+            double size_ = Imgproc.contourArea(contour);
+            if (size_>6000){real_count += 0;}
+            else if (size_>4800){real_count += 4;}
+            else if (size_>3600){real_count += 3;}
+            else if (size_>2400){real_count += 2;}
+            else if (size_>1200){real_count += 1;}
+            else if (size_<=1200){real_count += 0;} //38*38
+        }
+
+        return real_count;
+    }
+
+    public static int process(Mat init_img) {
+        init_img.convertTo(init_img, CvType.CV_8UC4);
+
+        Mat kernel = Mat.ones(3, 3, CvType.CV_32F);
+        kernel.put(1, 1, -8);
+
+        Mat kernel2 = Mat.ones(3, 3, CvType.CV_32F);
+
+        Mat img_gray = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+        Imgproc.cvtColor(init_img, img_gray, Imgproc.COLOR_RGBA2GRAY);
+
+        Mat img_thr = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
+        Imgproc.threshold(img_gray, img_thr, 110, 255, Imgproc.THRESH_BINARY);
+
+
+        List<MatOfPoint> cnts = new ArrayList<MatOfPoint>();
+
+        Imgproc.findContours(img_thr, cnts, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+
+        MatOfPoint cntWithBiggestArea = cnts.get(0);
+        double biggestArea = Imgproc.contourArea(cnts.get(0));
+        for (MatOfPoint contour : cnts) {
+            if (Imgproc.contourArea(contour) > biggestArea) {
+                cntWithBiggestArea = contour;
+                biggestArea = Imgproc.contourArea(contour);
+            }
+        }
+
+        Rect rect = Imgproc.boundingRect(cntWithBiggestArea);
+        Mat croppedImage = new Mat(img_gray, rect);
+
+        Mat resizedImage = new Mat(1024, 1024, CvType.CV_8UC1);
+        Imgproc.resize(croppedImage, resizedImage, new Size(1024, 1024));
+
+        int number = process2(resizedImage);
+        return number;
+    }
+
+
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
 
         try {
-
-            //mRgba.convertTo(mRgba, CvType.CV_8UC4);
-            Mat mLaplacian = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
-            Mat sharp = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
-            Mat mSubstr = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
-            Mat mSubstr2 = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
-            Mat mSubstr_prt = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
-            Imgproc.filter2D(mRgba, mLaplacian, CvType.CV_32FC4, kernel);
-            mRgba.convertTo(sharp,CvType.CV_32FC4);
-            Core.subtract(sharp, mLaplacian, mSubstr);
-            Core.normalize(mSubstr, mSubstr2, 0,1,NORM_MINMAX);
-            mSubstr2.convertTo(mSubstr_prt, CvType.CV_8UC4,255);
-
-
-            Mat img_gray = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
-            Imgproc.cvtColor(mSubstr_prt, img_gray, Imgproc.COLOR_RGBA2GRAY);
-
-
-            Mat img_thr = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC1);
-            Imgproc.threshold(img_gray, img_thr, 40, 255, Imgproc.THRESH_BINARY | Imgproc.THRESH_OTSU);
-
-
-            Mat img_dist = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC4);
-            Mat img_dist2 = new Mat(mRgba.height(), mRgba.width(), CvType.CV_32FC1);
-            Mat img_dist_prt = new Mat(mRgba.height(), mRgba.width(), CvType.CV_32FC1);
-            Imgproc.distanceTransform(img_thr, img_dist, Imgproc.DIST_L2, 3);
-            Core.normalize(img_dist, img_dist2, 0, 1.0, Core.NORM_MINMAX);
-            img_dist2.convertTo(img_dist_prt, CvType.CV_8UC1, 255);
-
-
-            Mat img_thr2 = new Mat(mRgba.height(), mRgba.width(), CvType.CV_8UC4);
-            Mat img_thr2_prt = new Mat(mRgba.height(), mRgba.width(), CvType.CV_32FC1);
-            //Imgproc.threshold(img_dist2, img_thr2, 0.1, 1.0, Imgproc.THRESH_BINARY);
-
-            Imgproc.adaptiveThreshold(img_dist_prt, img_thr2, 10, Imgproc.ADAPTIVE_THRESH_MEAN_C,
-                    Imgproc.THRESH_BINARY, 111, 0);
-            Imgproc.erode(img_thr2,img_thr2, Mat.ones(3, 3, CvType.CV_8U));
-            img_thr2.convertTo(img_thr2_prt, CvType.CV_8UC1, 255);
-
-
-
-
-            List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-
-            img_thr2.convertTo(img_thr2, CvType.CV_32SC1);
-
-            Imgproc.findContours(img_thr2, contours, new Mat(), Imgproc.RETR_FLOODFILL, Imgproc.CHAIN_APPROX_SIMPLE);
+            System.gc();
+            int number = process(mRgba);
 
             Imgproc.putText(
                     mRgba,                          // Matrix obj of the image
-                    "Number of cells: " + (int) contours.size(),          // Text to be added
+                    "Number of cells: " + (int) number,          // Text to be added
                     new Point(50, 150),               // point
                     Core.FONT_HERSHEY_SIMPLEX,      // front face
                     3,                               // front scale
