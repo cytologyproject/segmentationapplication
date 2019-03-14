@@ -69,6 +69,9 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     private Mat mDilated;
     private Mat image32S;
 
+    private List<Integer> circledBuffer;
+    private int circledBufferPointer;
+
     private CameraBridgeViewBase mOpenCvCameraView;
 
     private BaseLoaderCallback  mLoaderCallback = new BaseLoaderCallback(this) {
@@ -107,6 +110,9 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.color_blob_detection_activity_surface_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
+
+        circledBuffer = new ArrayList<Integer>(200);
+        circledBufferPointer = 0;
     }
 
     @Override
@@ -225,18 +231,16 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
 
     public static int process2(Mat img_gray) {
 
-        Mat img_thr2 = new Mat(img_gray.height(), img_gray.width(), CvType.CV_8UC4);
-        Mat img_thr2_prt = new Mat(img_gray.height(), img_gray.width(), CvType.CV_32FC1);
-        Imgproc.adaptiveThreshold(img_gray, img_thr2, 10, Imgproc.ADAPTIVE_THRESH_MEAN_C,
+        Imgproc.adaptiveThreshold(img_gray, img_gray, 10, Imgproc.ADAPTIVE_THRESH_MEAN_C,
                 Imgproc.THRESH_BINARY, 131, 0);
-        Imgproc.erode(img_thr2,img_thr2, Mat.ones(5, 5, CvType.CV_8U));
+        Imgproc.erode(img_gray, img_gray, Mat.ones(5, 5, CvType.CV_8U));
 
 
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 
-        img_thr2.convertTo(img_thr2, CvType.CV_32SC1);
+        img_gray.convertTo(img_gray, CvType.CV_32SC1);
 
-        Imgproc.findContours(img_thr2, contours, new Mat(), Imgproc.RETR_FLOODFILL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(img_gray, contours, new Mat(), Imgproc.RETR_FLOODFILL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         int real_count = 0;
 
@@ -256,21 +260,15 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     public static int process(Mat init_img) {
         init_img.convertTo(init_img, CvType.CV_8UC4);
 
-        Mat kernel = Mat.ones(3, 3, CvType.CV_32F);
-        kernel.put(1, 1, -8);
-
-        Mat kernel2 = Mat.ones(3, 3, CvType.CV_32F);
-
         Mat img_gray = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
         Imgproc.cvtColor(init_img, img_gray, Imgproc.COLOR_RGBA2GRAY);
 
-        Mat img_thr = new Mat(init_img.height(), init_img.width(), CvType.CV_8UC1);
-        Imgproc.threshold(img_gray, img_thr, 110, 255, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(img_gray, img_gray, 110, 255, Imgproc.THRESH_BINARY);
 
 
         List<MatOfPoint> cnts = new ArrayList<MatOfPoint>();
 
-        Imgproc.findContours(img_thr, cnts, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(img_gray, cnts, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
 
         MatOfPoint cntWithBiggestArea = cnts.get(0);
@@ -283,10 +281,9 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         }
 
         Rect rect = Imgproc.boundingRect(cntWithBiggestArea);
-        Mat croppedImage = new Mat(img_gray, rect);
 
         Mat resizedImage = new Mat(1024, 1024, CvType.CV_8UC1);
-        Imgproc.resize(croppedImage, resizedImage, new Size(1024, 1024));
+        Imgproc.resize(new Mat(img_gray, rect), resizedImage, new Size(1024, 1024));
 
         int number = process2(resizedImage);
         return number;
@@ -296,14 +293,22 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
+        int number = 0;
 
         try {
             System.gc();
-            int number = process(mRgba);
+            number = process(mRgba);
+
+            int number_average = 0;
+
+            for (int val : circledBuffer){
+                number_average+=val;
+            }
+            number_average = number_average / circledBuffer.size();
 
             Imgproc.putText(
                     mRgba,                          // Matrix obj of the image
-                    "Number of cells: " + (int) number,          // Text to be added
+                    "Number of cellS: " + (int) number_average + " " + (int) number,          // Text to be added
                     new Point(50, 150),               // point
                     Core.FONT_HERSHEY_SIMPLEX,      // front face
                     3,                               // front scale
@@ -319,6 +324,11 @@ public class ColorBlobDetectionActivity extends Activity implements OnTouchListe
         finally
         {
             mPreviousFrame = mCurrentFrame;
+            circledBuffer.set(circledBufferPointer, number);
+            circledBufferPointer++;
+            if (circledBufferPointer >= circledBuffer.size()){
+                circledBufferPointer=0;
+            }
         }
 
 
